@@ -2,6 +2,7 @@ package by.bogdan.ftp.client;
 
 import org.apache.commons.net.ftp.FTPClient;
 
+import javax.swing.*;
 import java.io.IOException;
 
 /**
@@ -9,43 +10,58 @@ import java.io.IOException;
  * date/time: 3/15/2018/6:28 PM
  * emails: bahdan.shyshkin@itechart-group.com
  * bogdanshishkin1998@gmail.com
- *
- * http://www.codejava.net/java-se/networking/ftp/how-to-upload-a-directory-to-a-ftp-server
- * Допилить
  */
 
 public class CustomFTPClient {
 
     public static void main(String[] args) {
         String server = "localhost";
-        int port = 21;
-        String user = "username";
-        String pass = "password";
+        int port = 2221;
+        String user = "bogdan";
+        String pass = "bugaga1";
 
-        FTPClient ftpClient = new FTPClient();
+        FTPClient ftpClient = FTPUtils.getLoggedInClient(server, port, user, pass);
+
+        while (true) {
+            String command = JOptionPane.showInputDialog("What to do?\n1-upload\n2-retrieve");
+            if (command.equals("exit")) break;
+            switch (command) {
+                case "1":
+                    uploadFiles(ftpClient);
+                    break;
+                case "2":
+                    getFiles(ftpClient);
+                    break;
+                default:
+                    System.out.println("Incorrect command");
+            }
+        }
+        if (ftpClient != null) {
+            FTPUtils.shutdown(ftpClient);
+        }
+
+    }
+
+    private static void getFiles(FTPClient ftpClient) {
+        String localFileName = JOptionPane.showInputDialog("Enter a new file name");
+        String remoteFileName = JOptionPane.showInputDialog("Enter path to the file to retrieve");
+        try {
+            FTPUtils.retrieveSingleFile(ftpClient, localFileName, remoteFileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void uploadFiles(FTPClient ftpClient) {
+        String remoteDirPath = JOptionPane.showInputDialog("Enter dist dir");
+        FTPUtils.createDirIfNotExists(remoteDirPath);
+
+        String localDirPath = JOptionPane.showInputDialog("Enter src dir");
 
         try {
-            // connect and login to the server
-            ftpClient.connect(server, port);
-            ftpClient.login(user, pass);
-
-            // use local passive mode to pass firewall
-            ftpClient.enterLocalPassiveMode();
-
-            System.out.println("Connected");
-
-            String remoteDirPath = "/Upload";
-            String localDirPath = "E:/Test/Download/FTP/Test";
-
             FTPUtils.uploadDirectory(ftpClient, remoteDirPath, localDirPath, "");
-
-            // log out and disconnect from the server
-            ftpClient.logout();
-            ftpClient.disconnect();
-
-            System.out.println("Disconnected");
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

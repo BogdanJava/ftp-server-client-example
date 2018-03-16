@@ -13,11 +13,7 @@ import org.apache.ftpserver.ftplet.UserManager;
 
 public class HomeHelper {
 
-    private static final String HOME_URL = "D:\\home\\";
-
-    public static String getFilePath(String fileName) {
-        return HOME_URL + fileName;
-    }
+    public static final String HOME_URL = "src/main/resources/home/";
 
     public static void saveUser(User user, UserManager userManager) {
         try {
